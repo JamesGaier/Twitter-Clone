@@ -14,7 +14,9 @@ console.log(process.env.MONGOURI);
 const PORT = '8080' || process.env.PORT;
 
 
-
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
 mongoose.set('debug', true);
 
 const MONGOURI:string =  process.env.MONGOURI ? process.env.MONGOURI:'';

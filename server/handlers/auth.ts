@@ -6,11 +6,23 @@ import { SECRET_NOT_FOUND } from '../handlers/error';
 import User, { IUser } from '../models/user';
 import { NextFunction } from 'express-serve-static-core';
 
-interface IJwt {
+export interface IJwt {
     email?: string | undefined | null,
     phone?: number | undefined | null,
     _id: string | undefined | null
 }
+export const getUser = (req: any, res: Response, next: NextFunction): void => {
+    const { email, phone} = req.user;
+
+    User.findOne({email, phone})
+            .then((user: IUser | null) => {
+                res.status(200).json(user);
+            })
+            .catch(err => {
+                next(err.message);
+                res.status(400).json({msg: err.message});
+            })
+};
 export const register = (req: Request, res: Response, next: NextFunction): void => {
 
     const user: IUser = req.body;

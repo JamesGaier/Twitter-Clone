@@ -42,30 +42,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.likePost = exports.removePost = exports.addPost = exports.getPosts = void 0;
 var user_1 = __importDefault(require("../models/user"));
 var post_1 = __importDefault(require("../models/post"));
-exports.getPosts = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var _id, user, err_1;
+exports.getPosts = function (req, res, next) {
     var _a;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                _id = (_a = req.params) === null || _a === void 0 ? void 0 : _a.id;
-                _b.label = 1;
-            case 1:
-                _b.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, user_1.default.findById(_id)
-                        .populate('posts')];
-            case 2:
-                user = _b.sent();
-                res.status(200).json(user.posts);
-                return [3 /*break*/, 4];
-            case 3:
-                err_1 = _b.sent();
-                next(err_1.message);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
-        }
+    var _id = (_a = req.params) === null || _a === void 0 ? void 0 : _a.id;
+    user_1.default.findById(_id)
+        .populate('posts')
+        .then(function (user) {
+        res.status(200).json(user.posts);
     });
-}); };
+};
 exports.addPost = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var postBody, userId, user, _id;
     var _a;
@@ -82,8 +67,9 @@ exports.addPost = function (req, res, next) { return __awaiter(void 0, void 0, v
                 _id = (_b.sent())._id;
                 user === null || user === void 0 ? void 0 : user.posts.push(_id);
                 user === null || user === void 0 ? void 0 : user.markModified('posts');
-                user === null || user === void 0 ? void 0 : user.save();
-                res.status(200).json({ post: postBody });
+                user === null || user === void 0 ? void 0 : user.save().then(function (user) {
+                    res.status(200).json({ post: postBody });
+                });
                 return [2 /*return*/];
         }
     });
@@ -124,8 +110,12 @@ exports.likePost = function (req, res, next) {
     post_1.default.findOne({ _id: _id })
         .then(function (post) {
         post.likes += parseInt(likeAmt);
-        post.save();
-        res.status(200).json(post);
+        post.save().then(function (post) {
+            res.status(200).json(post);
+        })
+            .catch(function (err) {
+            next(err.message);
+        });
     })
         .catch(function (err) {
         next(err.message);

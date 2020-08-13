@@ -39,17 +39,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.register = void 0;
+exports.login = exports.register = exports.getUser = void 0;
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-var console_1 = require("console");
-var error_1 = require("../handlers/error");
 var user_1 = __importDefault(require("../models/user"));
+exports.getUser = function (req, res, next) {
+    var _a = req.user, email = _a.email, phone = _a.phone;
+    user_1.default.findOne({ email: email, phone: phone })
+        .then(function (user) {
+        res.status(200).json(user);
+    })
+        .catch(function (err) {
+        next(err.message);
+        res.status(400).json({ msg: err.message });
+    });
+};
 exports.register = function (req, res, next) {
     var user = req.body;
     user_1.default.create(user)
         .then(function (toRet) {
         var secret = process.env.SECRET != null ? process.env.SECRET : '';
-        console_1.assert(secret !== '', error_1.SECRET_NOT_FOUND);
         var email = toRet.email, phone = toRet.phone, _id = toRet._id;
         var token = jsonwebtoken_1.default.sign({ email: email, phone: phone, _id: _id }, secret);
         res.status(200).json({
@@ -80,7 +88,6 @@ exports.login = function (req, res, next) { return __awaiter(void 0, void 0, voi
                 valid = _b.sent();
                 if (user != null && valid) {
                     secret = process.env.SECRET != null ? process.env.SECRET : '';
-                    console_1.assert(secret !== '', error_1.SECRET_NOT_FOUND);
                     _a = user || {}, email_1 = _a.email, phone = _a.phone, _id = _a._id;
                     token = jsonwebtoken_1.default.sign({ email: email_1, phone: phone, _id: _id }, secret);
                     res.status(200).json({
