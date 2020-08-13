@@ -1,3 +1,3 @@
 # Twitter-Clone
 
-A MERN clone of Twitter using typescript.
+A MERN stack clone of Twitter using typescript.
